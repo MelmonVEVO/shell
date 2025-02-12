@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 int main() {
@@ -15,19 +14,24 @@ int main() {
 
     input[strlen(input) - 1] = '\0';
 
-    char *command = strdup(input);
-    command = strtok(command, " ");
-
-    if (!strcmp(command, "exit")) {
+    if (!strncmp(input, "exit", 4)) {
       return 0;
-    } else if (!strcmp(command, "echo")) {
+    } else if (!strncmp(input, "echo", 4)) {
       if (strlen(input) > 5)
         printf("%s\n", input + 5);
+    } else if (!strncmp(input, "type", 4)) {
+      char *token = strtok(input, " ");
+      token = strtok(NULL, " ");
+      if (strcmp(token, "exit") && strcmp(token, "echo") &&
+          strcmp(token, "type")) {
+        printf("%s: not found\n", token);
+        continue;
+      }
+      printf("%s is a shell builtin\n", token);
+
     } else {
       printf("%s: command not found\n", input);
     }
-
-    free(command);
   }
   return 1;
 }
