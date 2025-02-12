@@ -5,15 +5,14 @@ int main() {
   // Flush after every printf
   setbuf(stdout, NULL);
 
-  // Uncomment this block to pass the first stage
-  printf("$ ");
+  while (1) {
+    printf("$ ");
+    // Wait for user input
+    char input[100];
+    fgets(input, 100, stdin);
 
-  // Wait for user input
-  char input[100];
-  fgets(input, 100, stdin);
-
-  input[strlen(input) - 1] = '\0';
-  printf("%s: command not found\n", input);
-
+    input[strlen(input) - 1] = '\0';
+    printf("%s: command not found\n", input);
+  }
   return 0;
 }
