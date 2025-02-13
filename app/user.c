@@ -11,6 +11,9 @@ void handle_user_input(char *input) {
     if (!strncmp(input, builtins_list[i].command,
                  strlen(builtins_list[i].command))) {
       builtins_list[i].execute(input);
+      return;
     }
   }
+
+  printf("%s: command not found\n", input);
 }

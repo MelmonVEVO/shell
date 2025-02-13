@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "builtins.h"
+#include "run.h"
 
 const Command builtins_list[BUILTIN_COUNT] = {
     {.command = "echo", .execute = &execute_echo},
@@ -15,40 +16,36 @@ void execute_echo(char *input) {
     printf("%s\n", input + 5);
 }
 
-int file_exists(const char *directory, const char *file) {
-  DIR *cwd = opendir(directory);
-  struct dirent *entry;
-  int found = 0;
-
-  return found;
+int scan_paths_for_binary(const char *path, const char *binary) {
+  char *path_token = strdup(path);
+  for (char *individual_path = strtok(path_token, ":"); individual_path != NULL;
+       individual_path = strtok(NULL, ":")) {
+    if (!check_file_exists(individual_path, binary)) {
+      printf("%s is %s/%s\n", binary, individual_path, binary);
+      free(path_token);
+      return 0;
+    }
+  }
+  free(path_token);
+  return 1;
 }
 
 void execute_type(char *input) {
-  char *token = strtok(input, " ");
-  token = strtok(NULL, " ");
+  char *cmd = strtok(input, " ");
+  cmd = strtok(NULL, " ");
 
   // shell builtins
-  if (!strcmp(token, "exit") || !strcmp(token, "echo") ||
-      !strcmp(token, "type")) {
-    printf("%s is a shell builtin\n", token);
+  if (!strcmp(cmd, "exit") || !strcmp(cmd, "echo") || !strcmp(cmd, "type")) {
+    printf("%s is a shell builtin\n", cmd);
     return;
   }
 
-  // TODO: PATH
-  /* const char *path = getenv("PATH"); */
-  /* char *path_token = strdup(path); */
-  /**/
-  /* for (path_token = strtok(path_token, ":"); path_token != NULL; */
-  /*      path_token = strtok(NULL, ":")) { */
-  /*   if (file_exists(path_token, token)) { */
-  /*     printf("%s is %s%s", token, path_token, token); */
-  /*     free(path_token); */
-  /*     return; */
-  /*   } */
-  /* } */
-  /* free(path_token); */
+  const char *path = getenv("PATH");
+  if (!scan_paths_for_binary(path, cmd)) {
+    return;
+  }
 
-  printf("%s: not found\n", token);
+  printf("%s: not found\n", cmd);
 }
 
 void execute_exit(char *input) { exit(0); }
