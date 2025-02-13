@@ -2,53 +2,42 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "builtins.h"
+#include "run.h"
 
-const Command builtins_list[BUILTIN_COUNT] = {
-    {.command = "echo", .execute = &execute_echo},
-    {.command = "type", .execute = &execute_type},
-    {.command = "exit", .execute = &execute_exit}};
+// Writes the user input to stdout.
+void execute_echo(int argc, char *argv[]) {
+  if (argc < 3)
+    return;
 
-void execute_echo(char *input) {
-  if (strlen(input) > 5)
-    printf("%s\n", input + 5);
+  printf("%s\n", argv[1]);
 }
 
-int file_exists(const char *directory, const char *file) {
-  DIR *cwd = opendir(directory);
-  struct dirent *entry;
-  int found = 0;
-
-  return found;
-}
-
-void execute_type(char *input) {
-  char *token = strtok(input, " ");
-  token = strtok(NULL, " ");
-
-  // shell builtins
-  if (!strcmp(token, "exit") || !strcmp(token, "echo") ||
-      !strcmp(token, "type")) {
-    printf("%s is a shell builtin\n", token);
+// Tells the user about a command they input.
+void execute_type(int argc, char *argv[]) {
+  if (argc < 3) {
+    printf("type: no argument provided");
     return;
   }
 
-  // TODO: PATH
-  /* const char *path = getenv("PATH"); */
-  /* char *path_token = strdup(path); */
-  /**/
-  /* for (path_token = strtok(path_token, ":"); path_token != NULL; */
-  /*      path_token = strtok(NULL, ":")) { */
-  /*   if (file_exists(path_token, token)) { */
-  /*     printf("%s is %s%s", token, path_token, token); */
-  /*     free(path_token); */
-  /*     return; */
-  /*   } */
-  /* } */
-  /* free(path_token); */
+  char *cmd = argv[1];
 
-  printf("%s: not found\n", token);
+  // shell builtins
+  if (!strcmp(cmd, "exit") || !strcmp(cmd, "echo") || !strcmp(cmd, "type")) {
+    printf("%s is a shell builtin\n", cmd);
+    return;
+  }
+
+  char directory_buffer[200];
+  if (!scan_paths_for_binary(cmd, directory_buffer, 200)) {
+    printf("%s is %s/%s\n", cmd, directory_buffer, cmd);
+    return;
+  }
+
+  printf("%s: not found\n", cmd);
 }
 
-void execute_exit(char *input) { exit(0); }
+// Exits the shell.
+void execute_exit(int argc, char *argv[]) { exit(0); }
