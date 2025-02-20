@@ -2,37 +2,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "builtins.h"
 #include "run.h"
 
-const Command builtins_list[BUILTIN_COUNT] = {
-    {.command = "echo", .execute = &execute_echo},
-    {.command = "type", .execute = &execute_type},
-    {.command = "exit", .execute = &execute_exit}};
+// Writes the user input to stdout.
+void execute_echo(int argc, char *argv[]) {
+  if (argc < 3)
+    return;
 
-void execute_echo(char *input) {
-  if (strlen(input) > 5)
-    printf("%s\n", input + 5);
+  printf("%s\n", argv[1]);
 }
 
-int scan_paths_for_binary(const char *path, const char *binary) {
-  char *path_token = strdup(path);
-  for (char *individual_path = strtok(path_token, ":"); individual_path != NULL;
-       individual_path = strtok(NULL, ":")) {
-    if (!check_file_exists(individual_path, binary)) {
-      printf("%s is %s/%s\n", binary, individual_path, binary);
-      free(path_token);
-      return 0;
-    }
+// Tells the user about a command they input.
+void execute_type(int argc, char *argv[]) {
+  if (argc < 3) {
+    printf("type: no argument provided");
+    return;
   }
-  free(path_token);
-  return 1;
-}
 
-void execute_type(char *input) {
-  char *cmd = strtok(input, " ");
-  cmd = strtok(NULL, " ");
+  char *cmd = argv[1];
 
   // shell builtins
   if (!strcmp(cmd, "exit") || !strcmp(cmd, "echo") || !strcmp(cmd, "type")) {
@@ -40,12 +30,14 @@ void execute_type(char *input) {
     return;
   }
 
-  const char *path = getenv("PATH");
-  if (!scan_paths_for_binary(path, cmd)) {
+  char directory_buffer[200];
+  if (!scan_paths_for_binary(cmd, directory_buffer, 200)) {
+    printf("%s is %s/%s\n", cmd, directory_buffer, cmd);
     return;
   }
 
   printf("%s: not found\n", cmd);
 }
 
-void execute_exit(char *input) { exit(0); }
+// Exits the shell.
+void execute_exit(int argc, char *argv[]) { exit(0); }
