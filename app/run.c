@@ -55,7 +55,7 @@ int scan_paths_for_binary(const char *binary, char *directory_buffer,
 // wait for the process to finish and will return its result code or it will
 // return -1 if the binary doesn't exist, or something else happened.
 int run_path_binary(const int argc, char *argv[]) {
-  if (argc < 2)
+  if (argc < 1)
     return -1;
 
   char directory_buffer[200];
@@ -73,6 +73,7 @@ int run_path_binary(const int argc, char *argv[]) {
     int status_code = execvp(full_path, argv);
     printf("/!\\ If you can see this, something has gone wrong! /!\\\n");
     printf("Status code: %d\n", status_code);
+    return -1;
   }
   // we are the parent
   int status;

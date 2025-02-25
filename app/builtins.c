@@ -9,15 +9,17 @@
 
 // Writes the user input to stdout.
 void execute_echo(int argc, char *argv[]) {
-  if (argc < 3)
+  if (argc < 2)
     return;
-
-  printf("%s\n", argv[1]);
+  for (int i = 1; i < argc; i++) {
+    printf("%s ", argv[1]);
+  }
+  printf("\n");
 }
 
 // Tells the user about a command they input.
 void execute_type(int argc, char *argv[]) {
-  if (argc < 3) {
+  if (argc < 2) {
     printf("type: no argument provided");
     return;
   }
@@ -41,3 +43,8 @@ void execute_type(int argc, char *argv[]) {
 
 // Exits the shell.
 void execute_exit(int argc, char *argv[]) { exit(0); }
+
+const Command builtins_list[BUILTIN_COUNT] = {
+    {.command = "echo", .execute = &execute_echo},
+    {.command = "type", .execute = &execute_type},
+    {.command = "exit", .execute = &execute_exit}};
