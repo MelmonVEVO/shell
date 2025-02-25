@@ -71,7 +71,7 @@ int run_path_binary(const int argc, char *argv[]) {
     char full_path[300];
     snprintf(full_path, sizeof(full_path), "%s/%s", directory_buffer, argv[0]);
     int status_code = execvp(full_path, argv);
-    printf("Program was passed %d args (including program name)\n", argc);
+    printf("Program was passed %d args (including program name).\n", argc);
     return -1;
   }
   // we are the parent
