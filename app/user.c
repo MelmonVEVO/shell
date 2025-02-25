@@ -11,10 +11,13 @@
 // null pointer. argv is dynamically allocated-you must free the memory yourself
 // with free_args_list().
 void extract_args(const char *input, int *argc, char ***argv) {
+  if (!input)
+    return;
+
   char *cpy = strdup(input);
   if (!cpy) {
     *argc = 0;
-    free(cpy);
+    *argv = NULL;
     return;
   }
 
@@ -25,12 +28,16 @@ void extract_args(const char *input, int *argc, char ***argv) {
     token = strtok(NULL, " ");
   }
 
-  free(cpy);
   *argc = count;
-
-  // horrible string shenanigans
+  strcpy(cpy, input);
   char **token_array = (char **)malloc((count + 1) * sizeof(char *));
-  cpy = strdup(input);
+  if (!token_array) {
+    free(cpy);
+    *argc = 0;
+    *argv = NULL;
+    return;
+  }
+  // horrible string shenanigans
   token = strtok(cpy, " ");
   for (int array_pos = 0; array_pos < count; array_pos++) {
     if (!token) {
@@ -38,6 +45,14 @@ void extract_args(const char *input, int *argc, char ***argv) {
       continue;
     }
     token_array[array_pos] = strdup(token);
+    if (!token_array[array_pos]) {
+      free(token_array);
+      free(token);
+      free(cpy);
+      *argc = 0;
+      *argv = NULL;
+      return;
+    }
     token = strtok(NULL, " ");
   }
   *argv = token_array;
