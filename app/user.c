@@ -6,17 +6,18 @@
 #include "run.h"
 #include "user.h"
 
-extern const Command builtins_list[BUILTIN_COUNT];
-
 // Takes a whole user input. Writes the arg count to argc
-// and a null-terminated array of arguments to argv. argc INCLUDES the null
-// pointer. argv is dynamically allocated-you must free the memory yourself with
-// free_args_list().
-void extract_args(char *input, int *argc, char ***argv) {
+// and a null-terminated array of arguments to argv. argc DOES NOT INCLUDE the
+// null pointer. argv is dynamically allocated-you must free the memory yourself
+// with free_args_list().
+void extract_args(const char *input, int *argc, char ***argv) {
+  if (!input)
+    return;
+
   char *cpy = strdup(input);
   if (!cpy) {
     *argc = 0;
-    free(cpy);
+    *argv = NULL;
     return;
   }
 
@@ -26,24 +27,38 @@ void extract_args(char *input, int *argc, char ***argv) {
     count++;
     token = strtok(NULL, " ");
   }
-  count++;
 
-  free(cpy);
   *argc = count;
-
+  strcpy(cpy, input);
+  char **token_array = (char **)malloc((count + 1) * sizeof(char *));
+  if (!token_array) {
+    free(cpy);
+    *argc = 0;
+    *argv = NULL;
+    return;
+  }
   // horrible string shenanigans
-  char **token_array = (char **)malloc((count) * sizeof(char *));
-  cpy = strdup(input);
   token = strtok(cpy, " ");
   for (int array_pos = 0; array_pos < count; array_pos++) {
+    if (!token) {
+      token_array[array_pos] = NULL;
+      continue;
+    }
     token_array[array_pos] = strdup(token);
+    if (!token_array[array_pos]) {
+      free(token_array);
+      free(token);
+      free(cpy);
+      *argc = 0;
+      *argv = NULL;
+      return;
+    }
     token = strtok(NULL, " ");
   }
-  token_array[count - 1] = NULL;
-  argv = &token_array;
+  *argv = token_array;
 }
 
-void free_args_list(int argc, char **argv) {
+void free_args_list(const int argc, char **argv) {
   for (int i = 0; i < argc; i++) {
     free(argv[i]);
   }
@@ -75,6 +90,5 @@ void handle_user_input(char *input) {
   }
 
   free_args_list(argc, argv);
-
   printf("%s: command not found\n", input);
 }
