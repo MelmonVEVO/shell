@@ -62,7 +62,7 @@ int run_path_binary(const int argc, char *argv[]) {
   if (scan_paths_for_binary(argv[0], directory_buffer, 200))
     return -1;
 
-  pid_t parent_pid = getpid();
+  /* pid_t parent_pid = getpid(); */
   pid_t child_pid = fork();
   if (child_pid == -1) {
     // failed to fork
