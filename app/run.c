@@ -72,11 +72,6 @@ int run_path_binary(const int argc, char *argv[]) {
     snprintf(full_path, sizeof(full_path), "%s/%s", directory_buffer, argv[0]);
     int status_code = execvp(full_path, argv);
     printf("Program was passed %d args (including program name)", argc);
-    printf("Arg #0 (program name): %s", argv[0]);
-    for (int i = 1; i < argc; i++) {
-      printf("Arg #%d: %s", i, argv[i]);
-    }
-    printf("Program Signature: %d", child_pid);
     return -1;
   }
   // we are the parent
