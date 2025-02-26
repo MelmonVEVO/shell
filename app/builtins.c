@@ -61,7 +61,7 @@ void execute_cd(int argc, char *argv[]) {
   }
 
   if (chdir(argv[1])) {
-    printf("cd: provided path does not exist or was malformed\n");
+    printf("cd: %s: No such file or directory\n", argv[1]);
   }
 }
 
