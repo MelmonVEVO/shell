@@ -55,8 +55,11 @@ void execute_exit(int argc, char *argv[]) {
 void execute_pwd(int argc, char *argv[]) { printf("%s\n", getcwd(NULL, 0)); }
 
 void execute_cd(int argc, char *argv[]) {
-  if (argc < 2) {
-    chdir("~");
+  if (argc < 2 || (argc > 1 && !strcmp(argv[1], "~"))) {
+    char *homedir = getenv("HOME");
+    if (!homedir)
+      return;
+    chdir(homedir);
     return;
   }
 
