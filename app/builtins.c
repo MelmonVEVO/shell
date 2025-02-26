@@ -1,4 +1,5 @@
 #include <dirent.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -50,6 +51,13 @@ void execute_exit(int argc, char *argv[]) {
   exit(0);
 }
 
+void execute_pwd(int argc, char *argv[]) {
+  char *cwd;
+  getcwd(cwd, PATH_MAX);
+  printf("%s\n", cwd);
+  free(cwd);
+}
+
 void execute_cd(int argc, char *argv[]) {
   if (argc < 2) {
     chdir("~");
@@ -65,4 +73,5 @@ const Command builtins_list[BUILTIN_COUNT] = {
     {.command = "echo", .execute = &execute_echo},
     {.command = "type", .execute = &execute_type},
     {.command = "exit", .execute = &execute_exit},
+    {.command = "pwd", .execute = &execute_pwd},
     {.command = "cd", .execute = &execute_cd}};
