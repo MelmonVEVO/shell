@@ -1,4 +1,5 @@
 #include <dirent.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -27,9 +28,12 @@ void execute_type(int argc, char *argv[]) {
   char *cmd = argv[1];
 
   // shell builtins
-  if (!strcmp(cmd, "exit") || !strcmp(cmd, "echo") || !strcmp(cmd, "type")) {
-    printf("%s is a shell builtin\n", cmd);
-    return;
+  for (unsigned int i = 0; i < BUILTIN_COUNT; i++) {
+    if (!strncmp(cmd, builtins_list[i].command,
+                 strlen(builtins_list[i].command))) {
+      printf("%s is a shell builtin\n", cmd);
+      return;
+    }
   }
 
   char directory_buffer[200];
@@ -50,14 +54,19 @@ void execute_exit(int argc, char *argv[]) {
   exit(0);
 }
 
+void execute_pwd(int argc, char *argv[]) { printf("%s\n", getcwd(NULL, 0)); }
+
 void execute_cd(int argc, char *argv[]) {
-  if (argc < 2) {
-    chdir("~");
+  if (argc < 2 || (argc > 1 && !strncmp(argv[1], "~", 1))) {
+    char *homedir = getenv("HOME");
+    if (!homedir)
+      return;
+    chdir(homedir);
     return;
   }
 
   if (chdir(argv[1])) {
-    printf("cd: provided path does not exist or was malformed\n");
+    printf("cd: %s: No such file or directory\n", argv[1]);
   }
 }
 
@@ -65,4 +74,5 @@ const Command builtins_list[BUILTIN_COUNT] = {
     {.command = "echo", .execute = &execute_echo},
     {.command = "type", .execute = &execute_type},
     {.command = "exit", .execute = &execute_exit},
+    {.command = "pwd", .execute = &execute_pwd},
     {.command = "cd", .execute = &execute_cd}};
