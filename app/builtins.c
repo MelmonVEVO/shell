@@ -28,7 +28,8 @@ void execute_type(int argc, char *argv[]) {
   char *cmd = argv[1];
 
   // shell builtins
-  if (!strcmp(cmd, "exit") || !strcmp(cmd, "echo") || !strcmp(cmd, "type")) {
+  if (!strcmp(cmd, "exit") || !strcmp(cmd, "echo") || !strcmp(cmd, "type") ||
+      !strcmp(cmd, "cd") || !strcmp(cmd, "pwd")) {
     printf("%s is a shell builtin\n", cmd);
     return;
   }
@@ -51,12 +52,7 @@ void execute_exit(int argc, char *argv[]) {
   exit(0);
 }
 
-void execute_pwd(int argc, char *argv[]) {
-  char *cwd;
-  getcwd(cwd, PATH_MAX);
-  printf("%s\n", cwd);
-  free(cwd);
-}
+void execute_pwd(int argc, char *argv[]) { printf("%s\n", getcwd(NULL, 0)); }
 
 void execute_cd(int argc, char *argv[]) {
   if (argc < 2) {
