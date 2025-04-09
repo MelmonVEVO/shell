@@ -1,14 +1,11 @@
 #include <dirent.h>
-/* #include <limits.h> */
 #include <stdio.h>
 #include <string.h>
-/* #include <unistd.h> */
 
 #include "user.h"
 
 int main(void) {
   char input[100];
-  /* char path[PATH_MAX]; */
 
   for (;;) {
     printf("$ " /*, getcwd(path, PATH_MAX) */);

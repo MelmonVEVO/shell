@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,48 +15,32 @@ void extract_args(const char *input, int *argc, char ***argv) {
   if (!input)
     return;
 
-  char *cpy = strdup(input);
-  if (!cpy) {
-    *argc = 0;
-    *argv = NULL;
-    return;
-  }
+  int argc_track = 0;
+  char **argv_track;
 
-  char *token = strtok(cpy, " ");
-  int count = 0;
-  while (token) {
-    count++;
-    token = strtok(NULL, " ");
-  }
+  const unsigned long input_length = strlen(input);
+  unsigned long word_start = 0;
+  bool parse_string = false;
+  bool escape = false;
 
-  *argc = count;
-  strcpy(cpy, input);
-  char **token_array = (char **)malloc((count + 1) * sizeof(char *));
-  if (!token_array) {
-    free(cpy);
-    *argc = 0;
-    *argv = NULL;
-    return;
-  }
-  // horrible string shenanigans
-  token = strtok(cpy, " ");
-  for (int array_pos = 0; array_pos < count; array_pos++) {
-    if (!token) {
-      token_array[array_pos] = NULL;
+  for (int input_char = 0; input_char < input_length; input_char++) {
+    switch (input[input_char]) {
+    case '\'':
+      parse_string = !parse_string;
+      break;
+    case '\\':
+      escape = true;
+      break;
+    }
+    if (parse_string || escape) // TEMP
       continue;
+    if (input[input_char] == ' ' && input_char - word_start > 0) {
+      argv_track = realloc(argv_track, ++argc_track);
+      char *word = (char *)malloc((input_char - word_start) * sizeof(char));
+      strncpy(word, &input[word_start], input_char - word_start);
+      word_start = input_char;
     }
-    token_array[array_pos] = strdup(token);
-    if (!token_array[array_pos]) {
-      free(token_array);
-      free(token);
-      free(cpy);
-      *argc = 0;
-      *argv = NULL;
-      return;
-    }
-    token = strtok(NULL, " ");
   }
-  *argv = token_array;
 }
 
 void free_args_list(const int argc, char **argv) {

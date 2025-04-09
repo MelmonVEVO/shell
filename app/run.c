@@ -14,20 +14,6 @@ int check_file_executable(const char *directory, const char *file) {
     return 1;
   }
   return 0;
-
-  // All this commented out code was my first try at this. As you can see, I'm
-  // not the brightest LED in the egirl's computer tower, so I decided to
-  // iterate through ALL files instead of just... checking if the file provided
-  // can be run.
-  /* DIR *cwd = opendir(directory); */
-  /* if (cwd == NULL) */
-  /*   return 1; */
-  /* struct dirent *entry; */
-  /* while ((entry = readdir(cwd))) { */
-  /*   if (!strncmp(entry->d_name, file, 256)) { */
-  /*     return 0; */
-  /*   } */
-  /* } */
 }
 
 // Scans all dirs in PATH for a specific binary. If it exists and is runnable,
